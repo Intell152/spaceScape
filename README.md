@@ -1,6 +1,6 @@
 # space_scape
 
-A new Flutter project.
+A Space Scape game in Flutter with Flame.
 
 ## Getting Started
 
