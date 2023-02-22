@@ -46,4 +46,9 @@ class EnemyManager extends Component with HasGameRef<SpaceScapeGame> {
     super.onRemove();
     _timer.stop();
   }
+
+  void reset() {
+    _timer.stop();
+    _timer.start();
+  }
 }

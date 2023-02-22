@@ -7,13 +7,17 @@ import 'package:flutter/material.dart';
 import 'package:space_scape/game/game.dart';
 import 'package:space_scape/enemy/enemy.dart';
 
-
 class Player extends SpriteComponent
     with CollisionCallbacks, HasGameRef<SpaceScapeGame> {
   JoystickComponent joystick;
   //TODO: Este valor puede asignarce dinamicamente para aumentar o reducir velocidad
   // ignore: prefer_final_fields
   double _speed = 300;
+  int _score = 0;
+  int get score => _score; //get values ​​without modifying
+
+  int _health = 100;
+  int get health => _health; //get values ​​without modifying
 
   final _random = Random();
 
@@ -74,7 +78,7 @@ class Player extends SpriteComponent
                 position: (position.clone() + Vector2(0, size.y / 2)),
                 child: CircleParticle(
                     radius: 0.5,
-                    //TODO: Cambiuar color de acuerdo a la nave
+                    //TODO: Cambiar color de acuerdo a la nave
                     paint: Paint()
                       ..color = const Color.fromARGB(255, 255, 126, 34)))));
 
@@ -86,7 +90,12 @@ class Player extends SpriteComponent
     super.onCollision(intersectionPoints, other);
 
     if (other is Enemy) {
-      print('Player hit enemy');
+      gameRef.camera.shake(intensity: 10);
+
+      _health -= 10;
+      if (_health <= 0) {
+        _health = 0;
+      }
     }
   }
 
@@ -99,5 +108,15 @@ class Player extends SpriteComponent
 
     bullet.anchor = Anchor.center;
     gameRef.add(bullet);
+  }
+
+  void addToScore(int points) {
+    _score += points;
+  }
+
+  void reset() {
+    _score = 0;
+    _health = 100;
+    position = gameRef.size / 2;
   }
 }
