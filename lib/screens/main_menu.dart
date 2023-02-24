@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:space_scape/screens/game_play.dart';
+import 'package:space_scape/screens/select_spaceship.dart';
 
 class MainMenu extends StatelessWidget {
   const MainMenu({Key? key}) : super(key: key);
@@ -15,18 +15,22 @@ class MainMenu extends StatelessWidget {
               padding: EdgeInsets.symmetric(vertical: 50),
               child: Text(
                 'Space Scape',
-                style: TextStyle(fontSize: 50, color: Colors.black, shadows: [
-                  Shadow(
-                    blurRadius: 15,
-                    color: Colors.white,
-                    offset: Offset.zero,
-                  ),
-                  Shadow(
-                    blurRadius: 20,
-                    color: Colors.white,
-                    offset: Offset.zero,
-                  )
-                ]),
+                style: TextStyle(
+                  fontSize: 50,
+                  color: Colors.black,
+                  shadows: [
+                    Shadow(
+                      blurRadius: 15,
+                      color: Colors.white,
+                      offset: Offset.zero,
+                    ),
+                    Shadow(
+                      blurRadius: 20,
+                      color: Colors.white,
+                      offset: Offset.zero,
+                    ),
+                  ],
+                ),
               ),
             ),
             SizedBox(
@@ -36,8 +40,11 @@ class MainMenu extends StatelessWidget {
               width: MediaQuery.of(context).size.width / 3,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(
-                      builder: (context) => const GamePlay()));
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (context) => const SelectSpaceShip(),
+                    ),
+                  );
                 },
                 child: const Text('Play'),
               ),

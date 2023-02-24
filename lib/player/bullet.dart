@@ -4,6 +4,7 @@ import 'package:space_scape/enemy/enemy.dart';
 
 class Bullet extends SpriteComponent with CollisionCallbacks {
   final double _speed = 450;
+  Vector2 direction = Vector2(0, -1);
 
   Bullet({
     Sprite? sprite,
@@ -38,7 +39,7 @@ class Bullet extends SpriteComponent with CollisionCallbacks {
   void update(double dt) {
     super.update(dt);
 
-    position += Vector2(0, -1) * _speed * dt;
+    position += direction * _speed * dt;
 
     if (position.y < 0) {
       removeFromParent();

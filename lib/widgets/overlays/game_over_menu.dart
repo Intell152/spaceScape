@@ -3,12 +3,12 @@ import 'package:space_scape/game/game.dart';
 import 'package:space_scape/screens/main_menu.dart';
 import 'package:space_scape/widgets/overlays/pause_button.dart';
 
-class PauseMenu extends StatelessWidget {
+class GameOverMenu extends StatelessWidget {
   // ignore: constant_identifier_names
-  static const String ID = 'PauseMenu';
+  static const String ID = 'GameOverMenu';
   final SpaceScapeGame gameRef;
 
-  const PauseMenu({Key? key, required this.gameRef}) : super(key: key);
+  const GameOverMenu({Key? key, required this.gameRef}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +19,7 @@ class PauseMenu extends StatelessWidget {
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 50),
             child: Text(
-              'Paused',
+              'Game Over',
               style: TextStyle(
                 fontSize: 50,
                 color: Colors.black,
@@ -38,25 +38,16 @@ class PauseMenu extends StatelessWidget {
               ),
             ),
           ),
+          
           SizedBox(
             height: MediaQuery.of(context).size.height / 4,
           ),
+
           SizedBox(
             width: MediaQuery.of(context).size.width / 3,
             child: ElevatedButton(
               onPressed: () {
-                gameRef.resumeEngine();
-                gameRef.overlays.remove(PauseMenu.ID);
-                gameRef.overlays.add(PauseButton.ID);
-              },
-              child: const Text('Resume'),
-            ),
-          ),
-          SizedBox(
-            width: MediaQuery.of(context).size.width / 3,
-            child: ElevatedButton(
-              onPressed: () {
-                gameRef.overlays.remove(PauseMenu.ID);
+                gameRef.overlays.remove(GameOverMenu.ID);
                 gameRef.overlays.add(PauseButton.ID);
                 gameRef.reset();
                 gameRef.resumeEngine();
@@ -64,11 +55,12 @@ class PauseMenu extends StatelessWidget {
               child: const Text('Restart'),
             ),
           ),
+
           SizedBox(
             width: MediaQuery.of(context).size.width / 3,
             child: ElevatedButton(
               onPressed: () {
-                gameRef.overlays.remove(PauseMenu.ID);
+                gameRef.overlays.remove(GameOverMenu.ID);
                 gameRef.reset();
                 gameRef.resumeEngine();
 

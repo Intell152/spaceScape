@@ -32,7 +32,8 @@ dependencies:
   flame: ^1.6.0
   flutter:
     sdk: flutter
-  google_fonts: ^4.0.3
+  flutter_carousel_slider: ^1.1.0
+  provider: ^6.0.5
 
 dev_dependencies:
   flutter_lints: ^2.0.0
@@ -63,11 +64,13 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-   - family: Tourney
-     fonts:
-       - asset: assets/fonts/Tourney-Regular.ttf
-       - asset: assets/fonts/Tourney-italic.ttf
-  
+    - family: Tourney
+      fonts:
+        - asset: assets/fonts/Tourney-Regular.ttf
+        - asset: assets/fonts/Tourney-Italic.ttf
+        - asset: assets/fonts/Tourney-Bold.ttf
+        - asset: assets/fonts/Tourney-Light.ttf
+        - asset: assets/fonts/Tourney-Medium.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro

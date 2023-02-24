@@ -5,14 +5,22 @@ import 'package:flame/particles.dart';
 import 'package:flutter/material.dart';
 import 'package:space_scape/game/command.dart';
 import 'package:space_scape/game/game.dart';
+import 'package:space_scape/models/enemy_data.dart';
 import 'package:space_scape/player/bullet.dart';
 import 'package:space_scape/player/player.dart';
 
 class Enemy extends SpriteComponent
     with CollisionCallbacks, HasGameRef<SpaceScapeGame> {
   //TODO: Este valor puede asignarce dinamicamente para aumentar o reducir velocidad
-  // ignore: prefer_final_fields
+  // double _speed;
+
+  late Timer _freezeTimer;
+
   double _speed = 200;
+
+  Vector2 _moveDirection = Vector2(0, 1);
+
+  final EnemyData enemyData;
 
   final _random = Random();
 
@@ -20,12 +28,26 @@ class Enemy extends SpriteComponent
     return (Vector2.random(_random) - Vector2.random(_random)) * 400;
   }
 
+  Vector2 getRandomDirection() {
+    return (Vector2.random(_random) - Vector2(0.5, -1)).normalized();
+  }
+
   Enemy({
-    Sprite? sprite,
-    Vector2? position,
-    Vector2? size,
+    required this.enemyData,
+    required Sprite? sprite,
+    required Vector2? position,
+    required Vector2? size,
   }) : super(sprite: sprite, position: position, size: size) {
     // angle = pi; pi = 180 degrees
+    _speed = enemyData.speed;
+
+    _freezeTimer = Timer(2, onTick: () {
+      _speed = enemyData.speed;
+    });
+
+    if (enemyData.hMove) {
+      _moveDirection = getRandomDirection();
+    }
   }
 
   @override
@@ -51,34 +73,57 @@ class Enemy extends SpriteComponent
       final command = Command<Player>(action: (player) {
         player.addToScore(10);
       });
-      gameRef.addCommand(command);
 
+      gameRef.addCommand(command);
+    }
+  }
+
+  @override
+  void onRemove() {
+    if (position.y < gameRef.size.y) {
       final destroyEffect = ParticleSystemComponent(
-          particle: Particle.generate(
-              count: 20,
-              lifespan: 0.1,
-              generator: (i) => AcceleratedParticle(
-                  acceleration: getRandomVector(),
-                  speed: getRandomVector(),
-                  position: (position.clone()),
-                  child: CircleParticle(
-                      radius: 2,
-                      //TODO: Cambiar color de acuerdo a la nave
-                      paint: Paint()
-                        ..color = const Color.fromARGB(255, 201, 196, 196)))));
+        particle: Particle.generate(
+          count: 20,
+          lifespan: 0.1,
+          generator: (i) => AcceleratedParticle(
+            acceleration: getRandomVector(),
+            speed: getRandomVector(),
+            position: (position.clone()),
+            child: CircleParticle(
+              radius: 2,
+              //TODO: Cambiar color de acuerdo a la nave
+              paint: Paint()..color = const Color.fromARGB(255, 201, 196, 196),
+            ),
+          ),
+        ),
+      );
 
       gameRef.add(destroyEffect);
     }
+    super.onRemove();
   }
 
   @override
   void update(double dt) {
     super.update(dt);
 
-    position += Vector2(0, 1) * _speed * dt;
+    _freezeTimer.update(dt);
+
+    // print('Update ${_speed}');
+    position += _moveDirection * _speed * dt;
 
     if (position.y > gameRef.size.y) {
       removeFromParent();
+    } else if ((position.x < size.x / 2) ||
+        (position.x > (gameRef.size.x - size.x / 2))) {
+      // Enemy is going outside vertical screen bounds, flip its x direction.
+      _moveDirection.x *= -1;
     }
+  }
+
+  void freeze() {
+    _speed = 0;
+    _freezeTimer.stop();
+    _freezeTimer.start();
   }
 }

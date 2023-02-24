@@ -3,29 +3,38 @@ import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:space_scape/enemy/enemy.dart';
 import 'package:space_scape/game/command.dart';
 import 'package:space_scape/player/bullet.dart';
 import 'package:space_scape/player/player.dart';
+import 'package:space_scape/models/player_data.dart';
 import 'package:space_scape/enemy/enemy_manager.dart';
+import 'package:space_scape/models/spaceship_data.dart';
+import 'package:space_scape/player/power_up.dart';
+import 'package:space_scape/player/power_up_manager.dart';
+import 'package:space_scape/widgets/overlays/game_over_menu.dart';
+import 'package:space_scape/widgets/overlays/pause_button.dart';
+import 'package:space_scape/widgets/overlays/pause_menu.dart';
 
 class SpaceScapeGame extends FlameGame
     with HasCollisionDetection, HasDraggables, HasTappables {
   late Player _player;
   late EnemyManager _enemyManager;
+  late PowerUpManager _powerUpManager;
   late final JoystickComponent _joystick;
   late TextComponent _playerScore;
   late TextComponent _playerHealth;
   Color _healthColor = const Color.fromARGB(255, 17, 166, 45);
 
-  late Sprite _playerSprite;
-  late Sprite _enemySprite;
-  late Sprite redLaser;
 
   final _commandList = List<Command>.empty(growable: true);
   final _addLaterCommandList = List<Command>.empty(growable: true);
 
   bool _isAlreadyLoaded = false;
+
+  static const spaceShipType = SpaceShipType.Canary;
+  final spaceShip = SpaceShip.getSpaceShipByType(spaceShipType);
 
   @override
   Future<void> onLoad() async {
@@ -39,13 +48,16 @@ class SpaceScapeGame extends FlameGame
       //     size: Vector2(64, 64),
       //     position: size / 2 );
 
-      await images.load('playerShip3_orange.png');
-      await images.load('enemyBlack2.png');
-      await images.load('laserRed01.png');
+      // await images.load('playerShip1_red.png');
+      // await images.load('playerShip2_red.png');
+      // await images.load('playerShip3_red.png');
+      // await images.load('playerShip4_red.png');
+      // await images.load('enemyBlack2.png');
+      // await images.load('laserRed01.png');
+      // await images.loadAll('fileNames')
+      await images.loadAllImages();
 
-      _playerSprite = Sprite(images.fromCache('playerShip3_orange.png'));
-      _enemySprite = Sprite(images.fromCache('enemyBlack2.png'));
-      redLaser = Sprite(images.fromCache('laserRed01.png'));
+      // redLaser = Sprite(images.fromCache('laserRed01.png'));
 
       _joystick = JoystickComponent(
         anchor: Anchor.bottomLeft,
@@ -55,23 +67,30 @@ class SpaceScapeGame extends FlameGame
           paint: Paint()..color = Colors.grey.withOpacity(0.5),
         ),
         knob: CircleComponent(
-            radius: 30,
-            paint: Paint()..color = const Color.fromARGB(255, 199, 196, 196)),
+          radius: 30,
+          paint: Paint()..color = const Color.fromARGB(255, 199, 196, 196),
+        ),
       );
 
       add(_joystick);
 
       _player = Player(
-          joystick: _joystick,
-          sprite: _playerSprite,
-          size: Vector2(32, 32),
-          position: size / 2);
+        spaceShipType: spaceShipType,
+        joystick: _joystick,
+        // sprite: _playerSprite,
+        sprite: Sprite(images.fromCache(spaceShip.assetPath)),
+        size: Vector2(32, 32),
+        position: size / 2,
+      );
 
       _player.anchor = Anchor.center;
       add(_player);
 
-      _enemyManager = EnemyManager(enemySprite: _enemySprite);
+      _enemyManager = EnemyManager();
       add(_enemyManager);
+
+      _powerUpManager = PowerUpManager();
+      add(_powerUpManager);
 
       final button = ButtonComponent(
         button: CircleComponent(
@@ -86,36 +105,51 @@ class SpaceScapeGame extends FlameGame
       add(button);
 
       _playerScore = TextComponent(
-          text: 'Score: 0',
-          position: Vector2(size.x - 10, 0),
-          textRenderer: TextPaint(
-              style: const TextStyle(
+        text: 'Score: 0',
+        position: Vector2(size.x - 10, 0),
+        textRenderer: TextPaint(
+          style: const TextStyle(
             color: Color.fromARGB(255, 243, 240, 210),
             fontSize: 16,
             fontFamily: 'BungeeInline',
-          )));
+          ),
+        ),
+      );
 
       _playerScore.anchor = Anchor.topRight;
-      _playerScore.positionType =
-          PositionType.viewport; //Prevents Camera's Transformation efects
+      //Prevents Camera's Transformation efects
+      _playerScore.positionType = PositionType.viewport;
+
       add(_playerScore);
 
       _playerHealth = TextComponent(
-          text: 'Health: 100%',
-          position: Vector2(10, 0),
-          textRenderer: TextPaint(
-              style: const TextStyle(
+        text: 'Health: 100%',
+        position: Vector2(10, 0),
+        textRenderer: TextPaint(
+          style: const TextStyle(
             color: Color.fromARGB(255, 255, 255, 255),
             fontSize: 16,
             fontFamily: 'BungeeInline',
-          )));
+          ),
+        ),
+      );
 
-      _playerHealth.positionType =
-          PositionType.viewport; //Prevents Camera's Transformation efects
+      //Prevents Camera's Transformation efects
+      _playerHealth.positionType = PositionType.viewport;
       add(_playerHealth);
 
       _isAlreadyLoaded = true;
     }
+  }
+
+  @override
+  void onAttach() {
+    if (buildContext != null) {
+      final playerData = Provider.of<PlayerData>(buildContext!, listen: false);
+
+      _player.setSpaceShiptype(playerData.spaceShipType);
+    }
+    super.onAttach();
   }
 
   @override
@@ -134,6 +168,25 @@ class SpaceScapeGame extends FlameGame
 
     _playerScore.text = 'Score: ${_player.score}';
     _playerHealth.text = 'HP: ${_player.health}%';
+
+    if (_player.health <= 0 && (!camera.shaking)) {
+      pauseEngine();
+      overlays.remove(PauseButton.ID);
+      overlays.add(GameOverMenu.ID);
+
+      _player = Player(
+        spaceShipType: spaceShipType,
+        joystick: _joystick,
+        // sprite: _playerSprite,
+        sprite: Sprite(images.fromCache(spaceShip.assetPath)),
+        size: Vector2(32, 32),
+        position: size / 2,
+      );
+
+      _player.anchor = Anchor.center;
+
+      add(_player);
+    }
   }
 
   @override
@@ -145,11 +198,36 @@ class SpaceScapeGame extends FlameGame
     }
 
     canvas.drawRRect(
-        RRect.fromLTRBR(
-            5, 2, _player.health.toDouble(), 18, const Radius.circular(10)),
-        Paint()..color = _healthColor);
+      RRect.fromLTRBR(
+        5,
+        2,
+        _player.health.toDouble(),
+        18,
+        const Radius.circular(10),
+      ),
+      Paint()..color = _healthColor,
+    );
 
     super.render(canvas);
+  }
+
+  @override
+  void lifecycleStateChange(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        break;
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.detached:
+        if (_player.health > 0) {
+          pauseEngine();
+          overlays.remove(PauseButton.ID);
+          overlays.add(PauseMenu.ID);
+        }
+        break;
+    }
+
+    super.lifecycleStateChange(state);
   }
 
   void addCommand(Command command) {
@@ -159,6 +237,8 @@ class SpaceScapeGame extends FlameGame
   void reset() {
     _player.reset();
     _enemyManager.reset();
+    _powerUpManager.reset();
+    _healthColor = const Color.fromARGB(255, 17, 166, 45);
 
     children.whereType<Enemy>().forEach((enemy) {
       enemy.removeFromParent();
@@ -166,6 +246,10 @@ class SpaceScapeGame extends FlameGame
 
     children.whereType<Bullet>().forEach((bullet) {
       bullet.removeFromParent();
+    });
+
+    children.whereType<PowerUp>().forEach((powerUp) {
+      powerUp.removeFromParent();
     });
   }
 }
