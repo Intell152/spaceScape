@@ -10,6 +10,7 @@ class AnimatedText extends StatefulWidget {
 class _AnimatedTextState extends State<AnimatedText> {
   @override
   Widget build(BuildContext context) {
+    
     return TweenAnimationBuilder(
       tween: Tween<double>(begin: 0.0, end: 1.0),
       curve: Curves.linear,

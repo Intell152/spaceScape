@@ -19,6 +19,7 @@ Future<void> main() async {
   });
 
   final game = await myGame();
+  
   runApp(
     MultiProvider(
       providers: [

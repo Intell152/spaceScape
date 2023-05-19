@@ -58,4 +58,16 @@ class SpaceScapeGame extends FlameGame with PanDetector {
   void onPanUpdate(DragUpdateInfo info) {
     _player.move(info.delta.game);
   }
+
+  @override
+  void onPanStart(DragStartInfo info) {
+    _player.attack();
+    super.onPanStart(info);
+  }
+
+  @override
+  void onPanEnd(DragEndInfo info) {
+    _player.stopAttack();
+    super.onPanEnd(info);
+  }
 }
