@@ -5,14 +5,14 @@ import 'bullet.dart';
 
 class PlayerComponent extends SpriteComponent with HasGameRef<SpaceScapeGame> {
   late Bullet _bullet;
-
+  late String _bulletPath;
   late Timer _attackTimer;
 
   PlayerComponent() : super() {
     _attackTimer = Timer(
       .5,
       onTick: () {
-        createBullet();
+        createBullet(_bulletPath);
       },
       repeat: true,
     );
@@ -51,8 +51,9 @@ class PlayerComponent extends SpriteComponent with HasGameRef<SpaceScapeGame> {
     }
   }
 
-  void attack() {
-    createBullet();
+  void attack(String bulletPath) {
+    _bulletPath = bulletPath;
+    createBullet(_bulletPath);
     _attackTimer.start();
   }
 
@@ -60,13 +61,13 @@ class PlayerComponent extends SpriteComponent with HasGameRef<SpaceScapeGame> {
     _attackTimer.stop();
   }
 
-  void createBullet() {
+  void createBullet(String bulletPath) {
     _bullet = Bullet()
-      ..sprite = Sprite(gameRef.images.fromCache('laserRed01.png'))
+      ..sprite = Sprite(gameRef.images.fromCache(bulletPath))
       ..position = position.clone()
       ..size = Vector2(20, 20);
 
-    _bullet.anchor = Anchor.center;
+    _bullet.position.x = _bullet.position.x + 7;
     gameRef.add(_bullet);
   }
 }

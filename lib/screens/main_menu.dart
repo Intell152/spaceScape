@@ -38,7 +38,7 @@ class MainMenu extends StatelessWidget {
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
                       builder: (context) => GameWidget(
-                        game: SpaceScapeGame(spaceShip: playerProvider.playerData.color),
+                        game: SpaceScapeGame(playerData: playerProvider.playerData),
                       ),
                     ),
                   );

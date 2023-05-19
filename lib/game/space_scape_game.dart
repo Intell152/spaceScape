@@ -6,6 +6,7 @@ import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 
 import 'player.dart';
+import '../models/player_model.dart';
 import '../controllers/meteor_manager.dart';
 import '../controllers/enemy_manager.dart';
 
@@ -13,19 +14,19 @@ class SpaceScapeGame extends FlameGame with PanDetector {
   late PlayerComponent _player;
   bool _isAlreadyLoaded = false;
 
-  late String spaceShip;
   late MeteorManager _meteorManager;
   late EnemyManager _enemyManager;
+  late Player playerData;
 
   SpaceScapeGame({
-    required this.spaceShip,
+    required this.playerData,
   });
 
   @override
   Future<FutureOr<void>> onLoad() async {
     if (!_isAlreadyLoaded) {
       await images.loadAllImages();
-      final playerSprite = Sprite(images.fromCache(spaceShip));
+      final playerSprite = Sprite(images.fromCache(playerData.spaceShipPath));
 
       ParallaxComponent backGround = await ParallaxComponent.load(
         [
@@ -61,7 +62,7 @@ class SpaceScapeGame extends FlameGame with PanDetector {
 
   @override
   void onPanStart(DragStartInfo info) {
-    _player.attack();
+    _player.attack(playerData.bulletPath);
     super.onPanStart(info);
   }
 

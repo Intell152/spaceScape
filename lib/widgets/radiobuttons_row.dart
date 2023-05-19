@@ -27,7 +27,7 @@ class _RadioButtonsRowState extends State<RadioButtonsRow> {
           child: InkResponse(
             onTap: () {
               FlameAudio.play('selection.ogg');
-              playerProvider.getPlayerData('playerShip1_orange.png');
+              playerProvider.getPlayerColor(Colors.orange);
               setState(() {
                 _highlighted = 1;
               });
@@ -58,7 +58,7 @@ class _RadioButtonsRowState extends State<RadioButtonsRow> {
           child: InkResponse(
             onTap: () {
               FlameAudio.play('selection.ogg');
-              playerProvider.getPlayerData('playerShip1_green.png');
+              playerProvider.getPlayerColor(Colors.green);
               setState(() {
                 _highlighted = 2;
               });
@@ -91,7 +91,7 @@ class _RadioButtonsRowState extends State<RadioButtonsRow> {
           child: InkResponse(
             onTap: () {
               FlameAudio.play('selection.ogg');
-              playerProvider.getPlayerData('playerShip1_blue.png');
+              playerProvider.getPlayerColor(Colors.blue);
               setState(() {
                 _highlighted = 3;
               });
