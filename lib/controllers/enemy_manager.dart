@@ -52,12 +52,12 @@ class EnemyManager extends Component with HasGameRef<SpaceScapeGame> {
   }
 
   void _spawn() {
-    Enemy enemy = Enemy()
+    EnemyComponent enemy = EnemyComponent()
       ..sprite = Sprite(gameRef.images.fromCache('enemyBlack1.png'))
       ..position =
           Vector2(random.nextDouble() * (gameRef.size.x - Vector2(32, 32).x), 0)
       ..size = Vector2(32, 32);
-
+      
     enemy.anchor = Anchor.center;
     add(enemy);
   }

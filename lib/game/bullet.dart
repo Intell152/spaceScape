@@ -3,7 +3,7 @@ import 'package:flame/components.dart';
 
 import 'enemy.dart';
 
-class Bullet extends SpriteComponent with CollisionCallbacks {
+class BulletComponent extends SpriteComponent with CollisionCallbacks {
   final double _speed = 450;
   Vector2 direction = Vector2(0, -1);
 
@@ -25,7 +25,7 @@ class Bullet extends SpriteComponent with CollisionCallbacks {
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollision(intersectionPoints, other);
 
-    if (other is Enemy) {
+    if (other is EnemyComponent) {
       removeFromParent();
     }
   }

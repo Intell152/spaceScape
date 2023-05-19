@@ -10,7 +10,7 @@ import '../models/player_model.dart';
 import '../controllers/meteor_manager.dart';
 import '../controllers/enemy_manager.dart';
 
-class SpaceScapeGame extends FlameGame with PanDetector {
+class SpaceScapeGame extends FlameGame with PanDetector, HasCollisionDetection {
   late PlayerComponent _player;
   bool _isAlreadyLoaded = false;
 
@@ -43,6 +43,8 @@ class SpaceScapeGame extends FlameGame with PanDetector {
         ..size = Vector2(32, 32)
         ..position = size / 2
         ..sprite = playerSprite;
+
+      _player.anchor = Anchor.center;
       add(_player);
 
       _meteorManager = MeteorManager();

@@ -1,13 +1,23 @@
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:space_scape/game/bullet.dart';
 import 'package:space_scape/game/space_scape_game.dart';
 
-class Meteor extends SpriteComponent with HasGameRef<SpaceScapeGame>{
+class MeteorComponent extends SpriteComponent
+    with CollisionCallbacks, HasGameRef<SpaceScapeGame> {
   final Vector2 _moveDirection = Vector2(0, 1);
   final double _speed = 50;
 
   @override
   void onMount() {
-    // TODO: implement onMount
+    final shape = CircleHitbox.relative(
+      0.8,
+      parentSize: size,
+      position: size / 2,
+      anchor: Anchor.center,
+    );
+
+    add(shape);
     super.onMount();
   }
 
@@ -24,5 +34,11 @@ class Meteor extends SpriteComponent with HasGameRef<SpaceScapeGame>{
     super.update(dt);
   }
 
-  
+  @override
+  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    if (other is BulletComponent) {
+      removeFromParent();
+    }
+    super.onCollision(intersectionPoints, other);
+  }
 }

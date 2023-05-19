@@ -1,12 +1,17 @@
+import 'package:flutter/material.dart';
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:space_scape/game/space_scape_game.dart';
 
 import 'bullet.dart';
+import '../game/enemy.dart';
+import '../game/space_scape_game.dart';
 
-class PlayerComponent extends SpriteComponent with HasGameRef<SpaceScapeGame> {
-  late Bullet _bullet;
+class PlayerComponent extends SpriteComponent
+    with CollisionCallbacks, HasGameRef<SpaceScapeGame> {
+  late BulletComponent _bullet;
   late String _bulletPath;
   late Timer _attackTimer;
+  bool _isVisible = true;
 
   PlayerComponent() : super() {
     _attackTimer = Timer(
@@ -19,8 +24,25 @@ class PlayerComponent extends SpriteComponent with HasGameRef<SpaceScapeGame> {
   }
 
   @override
+  void render(Canvas canvas) {
+    if (_isVisible) {
+      super.render(canvas);
+    }
+  }
+
+  @override
   void onMount() {
     _attackTimer.stop();
+
+    final shape = CircleHitbox.relative(
+      0.8,
+      parentSize: size,
+      position: size / 2,
+      anchor: Anchor.center,
+    );
+
+    add(shape);
+
     super.onMount();
   }
 
@@ -36,17 +58,28 @@ class PlayerComponent extends SpriteComponent with HasGameRef<SpaceScapeGame> {
     super.onRemove();
   }
 
+  @override
+  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    if (other is EnemyComponent) {
+      gameRef.camera.shake(intensity: 10);
+
+      _isVisible = false;
+    }
+    super.onCollision(intersectionPoints, other);
+  }
+
+  
+
   void move(Vector2 delta) {
     double newX = position.x + delta.x;
     double newY = position.y + delta.y;
     double screenWidth = gameRef.size.x;
     double screenHeight = gameRef.size.y;
-    double componentSize = 32.0;
 
     if (newX >= 0.0 &&
-        newX <= screenWidth - componentSize &&
+        newX <= screenWidth &&
         newY >= 0.0 &&
-        newY <= screenHeight - componentSize) {
+        newY <= screenHeight) {
       position.add(delta);
     }
   }
@@ -62,12 +95,13 @@ class PlayerComponent extends SpriteComponent with HasGameRef<SpaceScapeGame> {
   }
 
   void createBullet(String bulletPath) {
-    _bullet = Bullet()
+    _bullet = BulletComponent()
       ..sprite = Sprite(gameRef.images.fromCache(bulletPath))
       ..position = position.clone()
       ..size = Vector2(20, 20);
 
-    _bullet.position.x = _bullet.position.x + 7;
+    // _bullet.position.x = _bullet.position.x;
+    _bullet.anchor = Anchor.center;
     gameRef.add(_bullet);
   }
 }

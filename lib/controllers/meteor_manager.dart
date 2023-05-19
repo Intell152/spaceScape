@@ -52,7 +52,7 @@ class MeteorManager extends Component with HasGameRef<SpaceScapeGame> {
   }
 
   void _spawn() {
-    Meteor meteor = Meteor()
+    MeteorComponent meteor = MeteorComponent()
       ..sprite = Sprite(gameRef.images.fromCache('meteorBrown_tiny1.png'))
       ..position =
           Vector2(random.nextDouble() * (gameRef.size.x - Vector2(32, 32).x), 0)
