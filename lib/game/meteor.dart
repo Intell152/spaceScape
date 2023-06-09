@@ -1,6 +1,8 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
 import 'package:space_scape/game/bullet.dart';
+import 'package:space_scape/game/player.dart';
 import 'package:space_scape/game/space_scape_game.dart';
 
 class MeteorComponent extends SpriteComponent
@@ -36,8 +38,10 @@ class MeteorComponent extends SpriteComponent
 
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
-    if (other is BulletComponent) {
-      removeFromParent();
+    if (other is BulletComponent || other is PlayerComponent) {
+      sprite = Sprite(gameRef.images.fromCache('destroyedMeteor.png'));
+      add(RemoveEffect(delay: 0.05));
+      // removeFromParent();
     }
     super.onCollision(intersectionPoints, other);
   }

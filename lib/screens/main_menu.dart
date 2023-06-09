@@ -1,9 +1,6 @@
-import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-import '../game/space_scape_game.dart';
-import '../providers/player_provider.dart';
+import 'game_screen.dart';
 import '../widgets/animated_text.dart';
 import '../widgets/radiobuttons_row.dart';
 
@@ -11,9 +8,7 @@ class MainMenu extends StatelessWidget {
   const MainMenu({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final playerProvider = Provider.of<PlayerProvider>(context);
-    
+  Widget build(BuildContext context) {    
     return Scaffold(
       body: Center(
         child: Column(
@@ -37,9 +32,7 @@ class MainMenu extends StatelessWidget {
                 onPressed: () {
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
-                      builder: (context) => GameWidget(
-                        game: SpaceScapeGame(playerData: playerProvider.playerData),
-                      ),
+                      builder: (context) => const GameScreen(),
                     ),
                   );
                 },

@@ -12,6 +12,8 @@ class PlayerComponent extends SpriteComponent
   late String _bulletPath;
   late Timer _attackTimer;
   bool _isVisible = true;
+  int _health = 100;
+  int get health => _health; //get values ​​without modifying
 
   PlayerComponent() : super() {
     _attackTimer = Timer(
@@ -60,15 +62,19 @@ class PlayerComponent extends SpriteComponent
 
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    super.onCollision(intersectionPoints, other);
+
     if (other is EnemyComponent) {
       gameRef.camera.shake(intensity: 10);
 
-      _isVisible = false;
-    }
-    super.onCollision(intersectionPoints, other);
-  }
+      _health -= 10;
+      if (_health <= 0) {
+        _health = 0;
 
-  
+        _isVisible = false;
+      }
+    }
+  }
 
   void move(Vector2 delta) {
     double newX = position.x + delta.x;
@@ -103,5 +109,12 @@ class PlayerComponent extends SpriteComponent
     // _bullet.position.x = _bullet.position.x;
     _bullet.anchor = Anchor.center;
     gameRef.add(_bullet);
+  }
+
+  void reset() {
+    _isVisible = true;
+    // _playerData.currentScore = 0;
+    _health = 100;
+    position = gameRef.size / 2;
   }
 }

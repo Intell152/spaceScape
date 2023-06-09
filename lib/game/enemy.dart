@@ -1,19 +1,20 @@
+import 'dart:math';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
-// import 'package:flame/flame.dart';
 import 'package:flutter/material.dart';
-import 'package:space_scape/game/player.dart';
 
+import '../game/player.dart';
 import '../game/space_scape_game.dart';
 import 'bullet.dart';
 
 class EnemyComponent extends SpriteComponent
     with HasGameRef<SpaceScapeGame>, CollisionCallbacks {
+  late Timer _freezeTimer;
   final Vector2 _moveDirection = Vector2(0, 1);
-  final double _speed = 100;
+  double _speed = 100;
   int _hitPoints = 10;
-  late Image imagende;
+  late CircleHitbox _shape;
 
   final TextComponent _hpText = TextComponent(
     text: '10 HP',
@@ -27,17 +28,34 @@ class EnemyComponent extends SpriteComponent
     ),
   );
 
+  final _random = Random();
+
+  Vector2 getRandomVector() {
+    return (Vector2.random(_random) - Vector2.random(_random)) * 400;
+  }
+
+  Vector2 getRandomDirection() {
+    return (Vector2.random(_random) - Vector2(0.5, -1)).normalized();
+  }
+
+  EnemyComponent() : super() {
+    _speed = 100;
+    _freezeTimer = Timer(2, onTick: () {
+      _speed = 100;
+    });
+  }
+
   @override
   void onMount() {
     super.onMount();
 
-    final shape = CircleHitbox.relative(
+    _shape = CircleHitbox.relative(
       0.8,
       parentSize: size,
       position: size / 2,
       anchor: Anchor.center,
     );
-    add(shape);
+    add(_shape);
     add(_hpText);
   }
 
@@ -45,16 +63,12 @@ class EnemyComponent extends SpriteComponent
   void update(double dt) {
     _hpText.text = '$_hitPoints HP';
     if (_hitPoints <= 0) {
-      
       sprite = Sprite(gameRef.images.fromCache('destroyedShip01.png'));
-      add(RemoveEffect(delay: 0.05));
-
-      // final command = Command<Player>(action: (player) {
-      //   player.addToScore(enemyData.killPoints);
-      // });
-
-      // gameRef.addCommand(command);
+      _shape.collisionType = CollisionType.inactive;
+      add(RemoveEffect(delay: 0.1));
     }
+
+    _freezeTimer.update(dt);
 
     position += _moveDirection * _speed * dt;
     if (position.y > gameRef.size.y) {

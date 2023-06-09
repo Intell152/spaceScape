@@ -56,7 +56,8 @@ class EnemyManager extends Component with HasGameRef<SpaceScapeGame> {
       ..sprite = Sprite(gameRef.images.fromCache('enemyBlack1.png'))
       ..position =
           Vector2(random.nextDouble() * (gameRef.size.x - Vector2(32, 32).x), 0)
-      ..size = Vector2(32, 32);
+      ..size = Vector2(32, 32)
+      ..activeCollisions;
       
     enemy.anchor = Anchor.center;
     add(enemy);
