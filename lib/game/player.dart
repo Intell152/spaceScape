@@ -18,7 +18,8 @@ class PlayerComponent extends SpriteComponent
   bool _isVisible = true;
   int _health = 100;
   int get health => _health; //get values ​​without modifying
-  int get score => _playerProvider.playerData.score; //get values ​​without modifying
+  int get score =>
+      _playerProvider.playerData.score; //get values ​​without modifying
 
   PlayerComponent() : super() {
     _attackTimer = Timer(
@@ -134,7 +135,7 @@ class PlayerComponent extends SpriteComponent
 
   void reset() {
     _isVisible = true;
-    // _playerData.currentScore = 0;
+    _playerProvider.playerData.score = 0;
     _health = 100;
     position = gameRef.size / 2;
   }

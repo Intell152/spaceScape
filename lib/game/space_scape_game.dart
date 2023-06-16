@@ -10,6 +10,7 @@ import '../controllers/game_manager.dart';
 import '../screens/game_over_menu.dart';
 import '../screens/pause_menu.dart';
 import '../widgets/pause_button.dart';
+import 'enemy.dart';
 import 'player.dart';
 import '../game/bullet.dart';
 import '../models/player_model.dart';
@@ -197,8 +198,8 @@ class SpaceScapeGame extends FlameGame with PanDetector, HasCollisionDetection {
     _meteorManager.reset();
     _healthColor = const Color.fromARGB(255, 17, 166, 45);
 
-    children.whereType<EnemyManager>().forEach((enemy) {
-      enemy.removeWhere((component) => true);
+    children.whereType<EnemyComponent>().forEach((enemy) {
+      enemy.removeFromParent();
     });
 
     children.whereType<MeteorManager>().forEach((meteor) {

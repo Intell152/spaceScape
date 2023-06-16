@@ -69,10 +69,4 @@ class MeteorComponent extends SpriteComponent
     }
     super.onCollision(intersectionPoints, other);
   }
-
-  @override
-  void onRemove() {
-    // FlameAudio.play('Explosion2.mp3');
-    super.onRemove();
-  }
 }
