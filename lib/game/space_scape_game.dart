@@ -1,10 +1,15 @@
 import 'dart:async';
 import 'package:flame/parallax.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 
+import '../controllers/game_manager.dart';
+import '../screens/game_over_menu.dart';
+import '../screens/pause_menu.dart';
+import '../widgets/pause_button.dart';
 import 'player.dart';
 import '../game/bullet.dart';
 import '../models/player_model.dart';
@@ -19,6 +24,10 @@ class SpaceScapeGame extends FlameGame with PanDetector, HasCollisionDetection {
   late TextComponent _playerScore;
   late TextSpan _playerHealth;
   Color _healthColor = const Color.fromARGB(255, 17, 166, 45);
+
+  final _commandList = List<Command>.empty(growable: true);
+  final _addLaterCommandList = List<Command>.empty(growable: true);
+
   bool _isAlreadyLoaded = false;
 
   SpaceScapeGame({
@@ -43,7 +52,7 @@ class SpaceScapeGame extends FlameGame with PanDetector, HasCollisionDetection {
       add(backGround);
 
       _playerScore = TextComponent(
-        text: 'Score: 0',
+        text: 'Score: ${playerData.score}',
         position: Vector2(size.x - 10, 0),
         textRenderer: TextPaint(
           style: const TextStyle(
@@ -80,6 +89,30 @@ class SpaceScapeGame extends FlameGame with PanDetector, HasCollisionDetection {
   }
 
   @override
+  void update(double dt) {
+    super.update(dt);
+
+    for (var command in _commandList) {
+      for (var component in children) {
+        command.execute(component);
+      }
+    }
+
+    _commandList.clear();
+    _commandList.addAll(_addLaterCommandList);
+    _addLaterCommandList.clear();
+
+    _playerScore.text = 'Score: ${_player.score}';
+
+    if (_player.health <= 0 && (!camera.shaking)) {
+      FlameAudio.play('sfx_lose.ogg');
+      pauseEngine();
+      overlays.remove(PauseButton.ID);
+      overlays.add(GameOverMenu.ID);
+    }
+  }
+
+  @override
   void render(Canvas canvas) {
     if (_player.health == 30) {
       _healthColor = const Color.fromARGB(255, 226, 43, 40);
@@ -101,8 +134,6 @@ class SpaceScapeGame extends FlameGame with PanDetector, HasCollisionDetection {
       Paint()..color = _healthColor,
     );
 
-    // print('Game: ${_player.health}');
-
     _playerHealth = TextSpan(
       text: 'HP: ${_player.health}%',
       style: const TextStyle(
@@ -121,6 +152,25 @@ class SpaceScapeGame extends FlameGame with PanDetector, HasCollisionDetection {
   }
 
   @override
+  void lifecycleStateChange(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        break;
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.detached:
+        if (_player.health > 0) {
+          pauseEngine();
+          overlays.remove(PauseButton.ID);
+          overlays.add(PauseMenu.ID);
+        }
+        break;
+    }
+
+    super.lifecycleStateChange(state);
+  }
+
+  @override
   void onPanUpdate(DragUpdateInfo info) {
     _player.move(info.delta.game);
   }
@@ -135,6 +185,10 @@ class SpaceScapeGame extends FlameGame with PanDetector, HasCollisionDetection {
   void onPanEnd(DragEndInfo info) {
     _player.stopAttack();
     super.onPanEnd(info);
+  }
+
+  void addCommand(Command command) {
+    _addLaterCommandList.add(command);
   }
 
   void reset() {

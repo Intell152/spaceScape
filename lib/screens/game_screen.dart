@@ -1,6 +1,7 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:space_scape/screens/game_over_menu.dart';
 
 import '../screens/pause_menu.dart';
 import '../providers/player_provider.dart';
@@ -27,6 +28,7 @@ class GameScreen extends StatelessWidget{
           overlayBuilderMap: {
             PauseButton.ID: (BuildContext context, SpaceScapeGame gameRef) =>  PauseButton(gameRef: gameRef),
             PauseMenu.ID: (BuildContext context, SpaceScapeGame gameRef) =>  PauseMenu(gameRef: gameRef),
+            GameOverMenu.ID: (BuildContext context, SpaceScapeGame gameRef) => GameOverMenu(gameRef: gameRef),
           },
         ),
       ),
